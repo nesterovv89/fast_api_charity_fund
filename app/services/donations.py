@@ -8,7 +8,7 @@ from app.models.charity_project import CharityProject
 from app.models.donation import Donation
 
 
-def value_setting(db_obj):
+def mark_project_as_fully_invested_and_close(db_obj):
     db_obj.fully_invested = True
     db_obj.close_date = datetime.now()
 
@@ -34,12 +34,12 @@ async def donation_process(
             obj_in.invested_amount += remainder
         else:
             obj_in.invested_amount = obj_in.full_amount
-            value_setting(obj_in)
+            mark_project_as_fully_invested_and_close(obj_in)
 
             db_obj.invested_amount += obj_in.full_amount
 
             if db_obj.invested_amount == db_obj.full_amount:
-                value_setting(db_obj)
+                mark_project_as_fully_invested_and_close(db_obj)
 
         session.add(db_obj)
 

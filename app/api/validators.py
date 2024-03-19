@@ -19,7 +19,7 @@ async def check_name_duplicate(
         )
 
 
-async def check_charity_project_exists(
+async def check_charity_project_by_id(
     project_id: int, session: AsyncSession
 ) -> CharityProject:
     charity_project = await charity_project_crud.get(project_id, session)

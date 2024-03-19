@@ -4,17 +4,18 @@ from typing import Optional
 from pydantic import BaseModel, Extra, Field, PositiveInt
 
 from app.schemas.base import CharityProjectBase
+from app.core import constants as c
 
 
 class CharityProjectCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100)
-    description: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=c.MIN_STR_LENGTH, max_length=c.MAX_STR_LENGTH)
+    description: str = Field(..., min_length=c.MIN_STR_LENGTH)
     full_amount: PositiveInt
 
 
 class CharityProjectUpdate(CharityProjectCreate):
-    name: str = Field(None, min_length=1, max_length=100)
-    description: str = Field(None, min_length=1)
+    name: str = Field(None, min_length=c.MIN_STR_LENGTH, max_length=c.MAX_STR_LENGTH)
+    description: str = Field(None, min_length=c.MIN_STR_LENGTH)
     full_amount: PositiveInt = Field(None)
 
     class Config:
