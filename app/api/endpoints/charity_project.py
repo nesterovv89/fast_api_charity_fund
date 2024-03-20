@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.validators import (check_charity_project_by_id,
-                                check_correct_full_amount_for_update,
-                                check_name_duplicate, check_project_was_closed)
+from app.core.utils import get_project_or_404
 from app.core.db import get_async_session
 from app.core.user import current_superuser
+from app.models import CharityProject
 from app.crud.charity_project import charity_project_crud
 from app.schemas.charity_project import (CharityProjectCreate,
                                          CharityProjectDB,
                                          CharityProjectUpdate)
-from app.services import service_create_project, service_delete_charity_project
+from app.services import CharityFundService
 
 router = APIRouter()
+charity_project_model = CharityProject()
+charity_project_service = CharityFundService()
 
 
 @router.post(
@@ -26,7 +27,7 @@ async def create_new_charity_project(
     session: AsyncSession = Depends(get_async_session),
 ):
     """Только для суперюзеров."""
-    new_project = await service_create_project(charity_project, session)
+    new_project = await charity_project_service.create_project(charity_project, session)
     return new_project
 
 
@@ -51,7 +52,8 @@ async def delete_charity_project(
     session: AsyncSession = Depends(get_async_session),
 ):
     """Только для суперюзеров."""
-    charity_project = await service_delete_charity_project(project_id, session)
+    charity_project = await get_project_or_404(project_id, session, charity_project_model)
+    charity_project = await charity_project_service.delete_charity_project(project_id, session)
     return charity_project
 
 
@@ -66,12 +68,6 @@ async def update_charity_project(
     session: AsyncSession = Depends(get_async_session),
 ):
     """Только для суперюзеров."""
-    charity_project = await check_charity_project_by_id(project_id, session)
-    await check_name_duplicate(obj_in.name, session)
-    await check_project_was_closed(project_id, session)
-    await check_correct_full_amount_for_update(project_id, session, obj_in.full_amount)
-
-    charity_project = await charity_project_crud.update(
-        charity_project, obj_in, session
-    )
-    return charity_project
+    charity_project = await get_project_or_404(project_id, session, charity_project_model)
+    updated_charity_project = await charity_project_service.update_charity_project(charity_project, obj_in, session)
+    return updated_charity_project

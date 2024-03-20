@@ -6,10 +6,10 @@ from app.core.user import current_superuser, current_user
 from app.crud.donation import donation_crud
 from app.models import User
 from app.schemas.donation import AllDonations, DonationCreate, DonationDB
-from app.services.donations import donation_process
+from app.services import CharityFundService
 
 router = APIRouter()
-
+charity_project_service = CharityFundService()
 
 @router.get(
     '/',
@@ -31,8 +31,7 @@ async def create_donation(
     session: AsyncSession = Depends(get_async_session),
 ):
     new_donation = await donation_crud.create(donation, session)
-    await donation_process(new_donation, session)
-    await session.refresh(new_donation)
+    await charity_project_service.donation_process(new_donation, session)
     return new_donation
 
 
