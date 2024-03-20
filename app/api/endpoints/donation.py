@@ -11,6 +11,7 @@ from app.services import CharityFundService
 router = APIRouter()
 charity_project_service = CharityFundService()
 
+
 @router.get(
     '/',
     response_model_exclude_none=True,

@@ -17,13 +17,12 @@ class CharityFundService:
 
     def __init__(self):
         pass
-    
+
     async def create_project(self, charity_project: CharityProjectCreate, session):
         await self.check_name_duplicate(charity_project.name, session)
         new_project = await charity_project_crud.create(charity_project, session)
         new_project = await self.donation_process(new_project, session)
         return new_project
-    
 
     async def delete_charity_project(self, project_id: int, session):
         charity_project = await charity_project_crud.get(project_id, session)
@@ -33,8 +32,10 @@ class CharityFundService:
         )
         return charity_project
 
-
-    async def update_charity_project(self, charity_project: CharityProjectDB, obj_in: CharityProjectUpdate, session: AsyncSession):
+    async def update_charity_project(
+            self, charity_project: CharityProjectDB,
+            obj_in: CharityProjectUpdate, session: AsyncSession
+    ):
         await self.check_name_duplicate(obj_in.name, session)
         await self.check_project_was_closed(charity_project.id, session)
         await self.check_correct_full_amount_for_update(charity_project.id, session, obj_in.full_amount)
@@ -44,11 +45,9 @@ class CharityFundService:
         )
         return updated_charity_project
 
-
     def mark_project_as_fully_invested_and_close(self, db_obj):
         db_obj.fully_invested = True
         db_obj.close_date = datetime.now()
-
 
     async def donation_process(
         self, obj_in: Union[CharityProject, Donation], session: AsyncSession
@@ -85,7 +84,6 @@ class CharityFundService:
         await session.refresh(obj_in)
         return obj_in
 
-
     async def check_name_duplicate(
         self, project_name: str, session: AsyncSession
     ) -> None:
@@ -97,7 +95,6 @@ class CharityFundService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail='Проект с таким именем уже существует',
             )
-
 
     async def check_project_was_closed(
         self,
@@ -115,7 +112,6 @@ class CharityFundService:
                 detail='Проект уже закрыт'
             )
 
-
     async def check_project_was_invested(
         self,
         project_id: int,
@@ -130,7 +126,6 @@ class CharityFundService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail='Проект, в который проинвестировали, нельзя удалить')
-
 
     async def check_correct_full_amount_for_update(
         self,
