@@ -9,7 +9,6 @@ from app.schemas.donation import AllDonations, DonationCreate, DonationDB
 from app.services import CharityFundService
 
 router = APIRouter()
-charity_project_service = CharityFundService()
 
 
 @router.get(
@@ -18,7 +17,7 @@ charity_project_service = CharityFundService()
     response_model=list[AllDonations],
     dependencies=[Depends(current_superuser)],
 )
-async def get_all_donation(session: AsyncSession = Depends(get_async_session)):
+async def get_all_donation(session: AsyncSession = Depends(get_async_session),):
     return await donation_crud.get_multi(session)
 
 
@@ -31,8 +30,9 @@ async def create_donation(
     donation: DonationCreate,
     session: AsyncSession = Depends(get_async_session),
 ):
+    charity_project_service = CharityFundService(session)
     new_donation = await donation_crud.create(donation, session)
-    await charity_project_service.donation_process(new_donation, session)
+    await charity_project_service.donation_process(new_donation)
     return new_donation
 
 

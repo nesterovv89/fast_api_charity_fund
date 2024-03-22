@@ -13,7 +13,6 @@ from app.services import CharityFundService
 
 router = APIRouter()
 charity_project_model = CharityProject()
-charity_project_service = CharityFundService()
 
 
 @router.post(
@@ -27,7 +26,8 @@ async def create_new_charity_project(
     session: AsyncSession = Depends(get_async_session),
 ):
     """Только для суперюзеров."""
-    new_project = await charity_project_service.create_project(charity_project, session)
+    charity_project_service = CharityFundService(session)
+    new_project = await charity_project_service.create_project(charity_project)
     return new_project
 
 
@@ -52,8 +52,9 @@ async def delete_charity_project(
     session: AsyncSession = Depends(get_async_session),
 ):
     """Только для суперюзеров."""
-    charity_project = await get_project_or_404(project_id, session, charity_project_model)
-    charity_project = await charity_project_service.delete_charity_project(project_id, session)
+    charity_project_service = CharityFundService(session)
+    charity_project = await get_project_or_404(project_id, session)
+    charity_project = await charity_project_service.delete_charity_project(charity_project)
     return charity_project
 
 
@@ -65,9 +66,10 @@ async def delete_charity_project(
 async def update_charity_project(
     project_id: int,
     obj_in: CharityProjectUpdate,
-    session: AsyncSession = Depends(get_async_session),
+    session: AsyncSession = Depends(get_async_session)
 ):
     """Только для суперюзеров."""
-    charity_project = await get_project_or_404(project_id, session, charity_project_model)
-    updated_charity_project = await charity_project_service.update_charity_project(charity_project, obj_in, session)
+    charity_project_service = CharityFundService(session)
+    charity_project = await get_project_or_404(project_id, session)
+    updated_charity_project = await charity_project_service.update_charity_project(charity_project, obj_in)
     return updated_charity_project

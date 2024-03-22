@@ -22,29 +22,5 @@ class CRUDCharityProject(CRUDBase):
         db_project_id = db_project_id.scalars().first()
         return db_project_id
 
-    async def get_charity_project_close_date(
-        self,
-        project_id: int,
-        session: AsyncSession
-    ):
-        project_close_date = await session.execute(
-            select(CharityProject.close_date).where(
-                CharityProject.id == project_id
-            )
-        )
-        return project_close_date.scalars().first()
-
-    async def get_charity_project_invested_amount(
-        self,
-        project_id: int,
-        session: AsyncSession
-    ):
-        project_invested_amount = await session.execute(
-            select(CharityProject.invested_amount).where(
-                CharityProject.id == project_id
-            )
-        )
-        return project_invested_amount.scalars().first()
-
 
 charity_project_crud = CRUDCharityProject(CharityProject)
